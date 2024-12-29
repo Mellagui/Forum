@@ -18,12 +18,12 @@ type User struct {
 	Image        string `json:"image"`
 	Email        string `json:"email"`
 	PasswordHash string `json:"password_hash"`
-	CreatedAt time.Time
+	CreatedAt    time.Time
 }
 
 var (
-	db    *sql.DB
-	users []User
+	db               *sql.DB
+	users            []User
 	addAccountSucces bool
 	guest            bool
 	userEmail        string
@@ -36,6 +36,7 @@ func init() {
 	db, err = sql.Open("sqlite3", "database/database.db")
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 	Migrate()
 	// getData()
@@ -107,7 +108,9 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, r)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
+	return
 }
 
 func HandleSignIn(w http.ResponseWriter, r *http.Request) {
@@ -135,9 +138,10 @@ func HandleSignIn(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
 		}
-		err = tmpl.Execute(w, nil)
+		err = tmpl.Execute(w, r)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
 		}
 		return
 	}
@@ -155,7 +159,9 @@ func HandleSignIn(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, r)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
+	return
 }
 
 func HandleSignUp(w http.ResponseWriter, r *http.Request) {
@@ -174,25 +180,40 @@ func HandleSignUp(w http.ResponseWriter, r *http.Request) {
 
 		// if addAccountSucces Redirect to /Home
 		if addAccountSucces {
+			guest = false
 			addAccountSucces = false
 			http.Redirect(w, r, "/Home", 301)
 			return
 		}
+
+		tmpl, err := template.ParseFiles("sign-up-page.html")
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+		err = tmpl.Execute(w, r)
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		}
+		return
 	}
+
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
 	tmpl, err := template.ParseFiles("sign-up-page.html")
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-
 	err = tmpl.Execute(w, r)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
+	return
 }
 
 func HandleHome(w http.ResponseWriter, r *http.Request) {
@@ -206,29 +227,42 @@ func HandleHome(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-
 	err = tmpl.Execute(w, users)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
+	return
 }
 
 func HandleProfileAccount(w http.ResponseWriter, r *http.Request) {
-	// fmt.Println(guest)
+	if r.URL.Path != "/Profile_Account" {
+		http.Error(w, "404", http.StatusNotFound)
+		return
+	}
+	// if user hase no account riderect to /Sign_In
 	if guest {
 		http.Redirect(w, r, "/Sign_In", 301)
 		return
 	}
-	if r.Method == http.MethodPost {
-		name := r.FormValue("name")
-		email := r.FormValue("email")
-		fmt.Println(name)
-		fmt.Println(email)
+	if r.Method != http.MethodGet {
+		http.Error(w, "page - not found", 404)
+		return
 	}
 
 	data := GetUserByAny(userEmail)
-	tmpl, _ := template.ParseFiles("account-page.html")
-	tmpl.Execute(w, data)
+	fmt.Println(data)
+
+	tmpl, err := template.ParseFiles("account-page.html")
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 	return
 }
 
@@ -237,98 +271,50 @@ func HandleProfileUpdate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "page - not found", 404)
 		return
 	}
+	// if user hase no account riderect to /Sign_In
+	if guest {
+		http.Redirect(w, r, "/Sign_In", 301)
+		return
+	}
 
 	data := GetUserByAny(userEmail)
 
 	if r.Method == http.MethodPost {
+		fmt.Println("222222222")
 		name := r.FormValue("name")
 		email := r.FormValue("email")
-
-		// fmt.Println("1111111111111")
-		// fmt.Println(name)
-		// fmt.Println(email)
-		// fmt.Println(data)
-
-		if data.Name == name && data.Email == email {
-			// fmt.Println("222222222")
-			// fetch data ?
-			tmpl, err := template.ParseFiles("update-account-page.html")
-			if err != nil {
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-				return
-			}
-		
-			err = tmpl.Execute(w, data)
-			if err != nil {
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-				return
-			}
+		if len(name) == 0 {
+			name = data.Name
 		}
+		if len(email) == 0 {
+			email = data.Email
+		}
+		// 	// fetch data ?
 
-		tmpl, err := template.ParseFiles("update-account-page.html")
-		if err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-	
-		err = tmpl.Execute(w, data)
-		if err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
+		//  // update data ?
+		UpdateUser(email, name, userEmail)
+		userEmail = email
+		http.Redirect(w, r, "/Profile_Account", 301)
+		return
 	}
-	fmt.Println("33333333333")
 
+	fmt.Println("1111111111111")
 	if r.Method != http.MethodGet {
 		http.Error(w, "page - not found", 404)
 		return
 	}
+
 	tmpl, err := template.ParseFiles("update-account-page.html")
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-
 	err = tmpl.Execute(w, data)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-	}
-}
-
-func HandlePost(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/Post" {
-		http.Error(w, "404 not found", http.StatusNotFound)
 		return
 	}
-
-	tmpl, err := template.ParseFiles("post-page.html")
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	err = tmpl.Execute(w, r)
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-	}
-}
-
-func HandlePostUpdate(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/Post_Update" {
-		http.Error(w, "404 not found", http.StatusNotFound)
-		return
-	}
-
-	tmpl, err := template.ParseFiles("post-update-page.html")
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	err = tmpl.Execute(w, r)
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-	}
+	return
 }
 
 func HandleChatRoom(w http.ResponseWriter, r *http.Request) {
@@ -336,17 +322,28 @@ func HandleChatRoom(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "404", http.StatusNotFound)
 		return
 	}
-
-	tmpl, err := template.ParseFiles("messages-page.html")
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	// if user hase no account riderect to /Sign_In
+	if guest {
+		http.Redirect(w, r, "/Sign_In", 301)
 		return
 	}
 
-	err = tmpl.Execute(w, nil)
+	tmpl, err := template.ParseFiles("messages-page.html")
 	if err != nil {
+		fmt.Println("111111111")
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
 	}
+	data := GetUserByAny(userEmail)
+	fmt.Println(data)
+
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		fmt.Println("22222222222")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	return
 }
 
 func InsertUser(name, email, password string) {
@@ -356,10 +353,12 @@ func InsertUser(name, email, password string) {
 	err := db.QueryRow(maxId).Scan(&lastId)
 	if err != nil {
 		log.Fatalf("error queryrow maxid: %v", err)
+		return
 	}
 	_, err = db.Exec(query, lastId+1, name, defaultImage, email, password)
 	if err != nil {
 		log.Fatalf("error exec queryyy: %v", err)
+		return
 	}
 	addAccountSucces = true
 }
@@ -378,3 +377,60 @@ func GetUserByAny(required string) *User {
 	}
 	return &user
 }
+
+func UpdateUser(email, name, userEmail string) {
+	query := `UPDATE users SET user_name = ?, email = ? WHERE email = ?`
+	_, err := db.Exec(query, name, email, userEmail)
+	if err != nil {
+		log.Fatalf("error exec query Update: %v", err)
+		return
+	}
+}
+
+// func HandlePost(w http.ResponseWriter, r *http.Request) {
+// 	if r.URL.Path != "/Post" {
+// 		http.Error(w, "404 not found", http.StatusNotFound)
+// 		return
+// 	}
+
+// 	// if user hase no account riderect to /Sign_In
+// 	if guest {
+// 		http.Redirect(w, r, "/Sign_In", 301)
+// 		return
+// 	}
+
+// 	tmpl, err := template.ParseFiles("post-page.html")
+// 	if err != nil {
+// 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	err = tmpl.Execute(w, r)
+// 	if err != nil {
+// 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+// 	}
+// }
+
+// func HandlePostUpdate(w http.ResponseWriter, r *http.Request) {
+// 	if r.URL.Path != "/Post_Update" {
+// 		http.Error(w, "404 not found", http.StatusNotFound)
+// 		return
+// 	}
+
+// 	// if user hase no account riderect to /Sign_In
+// 	if guest {
+// 		http.Redirect(w, r, "/Sign_In", 301)
+// 		return
+// 	}
+
+// 	tmpl, err := template.ParseFiles("post-update-page.html")
+// 	if err != nil {
+// 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	err = tmpl.Execute(w, r)
+// 	if err != nil {
+// 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+// 	}
+// }
