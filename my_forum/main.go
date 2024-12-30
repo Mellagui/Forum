@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -13,15 +15,22 @@ import (
 )
 
 type User struct {
-	ID           int    `json:"id"`
-	Name         string `json:"name"`
-	Image        string `json:"image"`
-	Email        string `json:"email"`
-	PasswordHash string `json:"password_hash"`
+	ID           int
+	Name         string
+	Image        string
+	Email        string
+	PasswordHash string
 	CreatedAt    time.Time
+}
+type Usss struct {
+	IDS    int    `json:"id"`
+	NameS  string `json:"name"`
+	ImageS string `json:"image"`
+	EmailS string `json:"email"`
 }
 
 var (
+	usss             []Usss
 	db               *sql.DB
 	users            []User
 	addAccountSucces bool
@@ -39,7 +48,7 @@ func init() {
 		return
 	}
 	Migrate()
-	// getData()
+	getData()
 }
 
 func Migrate() {
@@ -54,28 +63,30 @@ func Migrate() {
 	log.Println("Database migrated successfully!")
 }
 
-// func getData() {
-// 	URL := "https://groupietrackers.herokuapp.com/api/artists"
-// 	resp, err := http.Get(URL)
-// 	if err != nil {
-// 		fmt.Println("...........", err)
-// 		return
-// 	}
-// 	defer resp.Body.Close()
-// 	if resp.StatusCode != 200 {
-// 		fmt.Println("cant get data status code !200")
-// 		return
-// 	}
-// 	err = json.NewDecoder(resp.Body).Decode(&users)
-// 	if err != nil {
-// 		fmt.Println("............", err)
-// 	}
-// }
+func getData() {
+	URL := "https://groupietrackers.herokuapp.com/api/artists"
+	resp, err := http.Get(URL)
+	if err != nil {
+		fmt.Println("...........", err)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		fmt.Println("cant get data status code !200")
+		return
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&usss)
+	if err != nil {
+		fmt.Println("............", err)
+	}
+}
 
 func main() {
 	defer db.Close()
 	guest = true
 
+	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
 	http.HandleFunc("/", HandleIndex)
 	http.HandleFunc("/Sign_In", HandleSignIn)
 	http.HandleFunc("/Sign_Up", HandleSignUp)
@@ -129,7 +140,7 @@ func HandleSignIn(w http.ResponseWriter, r *http.Request) {
 		// Is Valid Acconut Redirect to /Home
 		if data.Email == userEmail && data.PasswordHash == password {
 			guest = false
-			http.Redirect(w, r, "/Home", 301)
+			http.Redirect(w, r, "/Home", 303) // 301: Moved Permanently // 302: Found // 303: See Other
 			return
 		}
 
@@ -141,7 +152,6 @@ func HandleSignIn(w http.ResponseWriter, r *http.Request) {
 		err = tmpl.Execute(w, r)
 		if err != nil {
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
 		}
 		return
 	}
@@ -159,7 +169,6 @@ func HandleSignIn(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, r)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
 	}
 	return
 }
@@ -182,7 +191,7 @@ func HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		if addAccountSucces {
 			guest = false
 			addAccountSucces = false
-			http.Redirect(w, r, "/Home", 301)
+			http.Redirect(w, r, "/Home", 303)
 			return
 		}
 
@@ -211,11 +220,8 @@ func HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, r)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
 	}
-	return
 }
-
 func HandleHome(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/Home" {
 		http.Error(w, "404", http.StatusNotFound)
@@ -227,12 +233,10 @@ func HandleHome(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	err = tmpl.Execute(w, users)
+	err = tmpl.Execute(w, usss)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
 	}
-	return
 }
 
 func HandleProfileAccount(w http.ResponseWriter, r *http.Request) {
@@ -242,7 +246,7 @@ func HandleProfileAccount(w http.ResponseWriter, r *http.Request) {
 	}
 	// if user hase no account riderect to /Sign_In
 	if guest {
-		http.Redirect(w, r, "/Sign_In", 301)
+		http.Redirect(w, r, "/Sign_In", 303)
 		return
 	}
 	if r.Method != http.MethodGet {
@@ -261,9 +265,7 @@ func HandleProfileAccount(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, data)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
 	}
-	return
 }
 
 func HandleProfileUpdate(w http.ResponseWriter, r *http.Request) {
@@ -271,39 +273,64 @@ func HandleProfileUpdate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "page - not found", 404)
 		return
 	}
-	// if user hase no account riderect to /Sign_In
+	// Redirect guests to sign in
 	if guest {
-		http.Redirect(w, r, "/Sign_In", 301)
+		http.Redirect(w, r, "/Sign_In", 303)
 		return
 	}
 
 	data := GetUserByAny(userEmail)
 
 	if r.Method == http.MethodPost {
-		fmt.Println("222222222")
+		// Handle text fields
 		name := r.FormValue("name")
 		email := r.FormValue("email")
+		password := r.FormValue("password")
 		if len(name) == 0 {
 			name = data.Name
 		}
 		if len(email) == 0 {
 			email = data.Email
 		}
-		// 	// fetch data ?
 
-		//  // update data ?
-		UpdateUser(email, name, userEmail)
+		// Handle file upload
+		file, handler, err := r.FormFile("image")
+		if err != nil && err != http.ErrMissingFile { // Allow updates without file
+			http.Error(w, "Error retrieving the file", http.StatusInternalServerError)
+			return
+		}
+		defer func() {
+			if file != nil {
+				file.Close()
+			}
+		}()
+
+		imagePath := data.Image // Keep the existing image if no new file is uploaded
+		if file != nil {
+			log.Printf("Saving file: %s", handler.Filename)
+			dst, err := os.Create("./uploads/" + handler.Filename)
+			if err != nil {
+				http.Error(w, "Unable to save file", http.StatusInternalServerError)
+				return
+			}
+			defer dst.Close()
+			_, err = io.Copy(dst, file)
+			if err != nil {
+				http.Error(w, "Error saving the file", http.StatusInternalServerError)
+				return
+			}
+			imagePath = "/uploads/" + handler.Filename
+			log.Printf("File saved successfully: %s", imagePath)
+		}
+
+		// Update user in the database
+		UpdateUser(email, name, imagePath, password, userEmail)
 		userEmail = email
-		http.Redirect(w, r, "/Profile_Account", 301)
+		http.Redirect(w, r, "/Profile_Account", 303)
 		return
 	}
 
-	fmt.Println("1111111111111")
-	if r.Method != http.MethodGet {
-		http.Error(w, "page - not found", 404)
-		return
-	}
-
+	// Render the update page
 	tmpl, err := template.ParseFiles("update-account-page.html")
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
@@ -312,10 +339,57 @@ func HandleProfileUpdate(w http.ResponseWriter, r *http.Request) {
 	err = tmpl.Execute(w, data)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
 	}
-	return
 }
+
+// func HandleProfileUpdate(w http.ResponseWriter, r *http.Request) {
+// 	if r.URL.Path != "/Update_Profile" {
+// 		http.Error(w, "page - not found", 404)
+// 		return
+// 	}
+// 	// if user hase no account riderect to /Sign_In
+// 	if guest {
+// 		http.Redirect(w, r, "/Sign_In", 303)
+// 		return
+// 	}
+
+// 	data := GetUserByAny(userEmail)
+
+// 	if r.Method == http.MethodPost {
+// 		// fmt.Println("222222222")
+// 		name := r.FormValue("name")
+// 		email := r.FormValue("email")
+// 		if len(name) == 0 {
+// 			name = data.Name
+// 		}
+// 		if len(email) == 0 {
+// 			email = data.Email
+// 		}
+// 		// 	// fetch data ?
+
+// 		//  // update data ?
+// 		UpdateUser(email, name, userEmail)
+// 		userEmail = email
+// 		http.Redirect(w, r, "/Profile_Account", 303)
+// 		return
+// 	}
+
+// 	// fmt.Println("1111111111111")
+// 	if r.Method != http.MethodGet {
+// 		http.Error(w, "page - not found", 404)
+// 		return
+// 	}
+
+// 	tmpl, err := template.ParseFiles("update-account-page.html")
+// 	if err != nil {
+// 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+// 		return
+// 	}
+// 	err = tmpl.Execute(w, data)
+// 	if err != nil {
+// 		http.Error(w, "Internal server error", http.StatusInternalServerError)
+// 	}
+// }
 
 func HandleChatRoom(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/Chat_Rooms" {
@@ -324,7 +398,7 @@ func HandleChatRoom(w http.ResponseWriter, r *http.Request) {
 	}
 	// if user hase no account riderect to /Sign_In
 	if guest {
-		http.Redirect(w, r, "/Sign_In", 301)
+		http.Redirect(w, r, "/Sign_In", 303)
 		return
 	}
 
@@ -352,19 +426,20 @@ func InsertUser(name, email, password string) {
 	maxId := "select COALESCE(MAX(id), 0) from users"
 	err := db.QueryRow(maxId).Scan(&lastId)
 	if err != nil {
-		log.Fatalf("error queryrow maxid: %v", err)
+		log.Printf("error queryrow maxid: %v", err)
 		return
 	}
 	_, err = db.Exec(query, lastId+1, name, defaultImage, email, password)
 	if err != nil {
-		log.Fatalf("error exec queryyy: %v", err)
+		log.Printf("error exec queryyy: %v", err)
 		return
 	}
 	addAccountSucces = true
 }
 
 func GetUserByAny(required string) *User {
-	query := "select id, user_name, user_image, email, password_hash, created_at from users where email = ?"
+	// iyner join
+	query := "SELECT id, user_name, user_image, email, password_hash, created_at FROM users WHERE email = ?"
 	var user User
 	err := db.QueryRow(query, required).Scan(&user.ID, &user.Name, &user.Image, &user.Email, &user.PasswordHash, &user.CreatedAt)
 	if err != nil {
@@ -378,38 +453,40 @@ func GetUserByAny(required string) *User {
 	return &user
 }
 
-func UpdateUser(email, name, userEmail string) {
-	query := `UPDATE users SET user_name = ?, email = ? WHERE email = ?`
-	_, err := db.Exec(query, name, email, userEmail)
-	if err != nil {
-		log.Fatalf("error exec query Update: %v", err)
-		return
-	}
+func UpdateUser(email, name, image, password, userEmail string) {
+    log.Printf("Updating user: name=%s, image=%s, email=%s, password=%s, oldEmail=%s", name, image, email, password, userEmail)
+    query := `UPDATE users SET user_name = ?, user_image = ?, email = ?, password_hash = ? WHERE email = ?`
+    _, err := db.Exec(query, name, image, email, password, userEmail)
+    if err != nil {
+        log.Printf("error exec query Update: %v", err)
+        return
+    }
+    log.Println("User updated successfully")
 }
 
-// func HandlePost(w http.ResponseWriter, r *http.Request) {
-// 	if r.URL.Path != "/Post" {
-// 		http.Error(w, "404 not found", http.StatusNotFound)
-// 		return
-// 	}
+func HandlePost(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/Post" {
+		http.Error(w, "404 not found", http.StatusNotFound)
+		return
+	}
 
-// 	// if user hase no account riderect to /Sign_In
-// 	if guest {
-// 		http.Redirect(w, r, "/Sign_In", 301)
-// 		return
-// 	}
+	// if user hase no account riderect to /Sign_In
+	if guest {
+		http.Redirect(w, r, "/Sign_In", 303)
+		return
+	}
 
-// 	tmpl, err := template.ParseFiles("post-page.html")
-// 	if err != nil {
-// 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-// 		return
-// 	}
+	tmpl, err := template.ParseFiles("post-page.html")
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 
-// 	err = tmpl.Execute(w, r)
-// 	if err != nil {
-// 		http.Error(w, "Internal server error", http.StatusInternalServerError)
-// 	}
-// }
+	err = tmpl.Execute(w, r)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+	}
+}
 
 // func HandlePostUpdate(w http.ResponseWriter, r *http.Request) {
 // 	if r.URL.Path != "/Post_Update" {
@@ -419,7 +496,7 @@ func UpdateUser(email, name, userEmail string) {
 
 // 	// if user hase no account riderect to /Sign_In
 // 	if guest {
-// 		http.Redirect(w, r, "/Sign_In", 301)
+// 		http.Redirect(w, r, "/Sign_In", 303)
 // 		return
 // 	}
 

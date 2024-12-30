@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Profile</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
     <style>
         /* Navbar styles */
         .navbar {
@@ -120,7 +120,7 @@
 
         .content {
             display: flex;
-            border: 1px solid #333;
+            /* border: 1px solid #333; */
             margin: 4rem;
             justify-content: center;
             align-items: center;
@@ -139,7 +139,7 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 15px;
-            border: 1px solid #333;
+            /* border: 1px solid #333; */
         }
 
         .profile-pic {
@@ -152,7 +152,7 @@
 
         .post-info {
             flex: 1;
-            border: 1px solid #333;
+            /* border: 1px solid #333; */
             margin-top: 20px;
         }
 
@@ -176,7 +176,7 @@
             font-size: 14px;
             color: #aaa;
             line-height: 1.5;
-            border: 1px solid #333;
+            /* border: 1px solid #333; */
 
         }
 
@@ -188,7 +188,7 @@
             margin-top: 40px;
             font-size: 14px;
             color: #444;
-            border: 1px solid #333;
+            /* border: 1px solid #333; */
         }
 
         a {
@@ -232,6 +232,57 @@
             outline: none;
             border-color: #0f0; /* Green border on focus */
         }
+.profile-pic-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.profile-pic {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.profile-pic-container:hover .profile-pic {
+    transform: scale(1.1);
+}
+
+.upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.profile-pic-container:hover .upload-overlay {
+    opacity: 1;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.upload-overlay span {
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+input[type="file"] {
+    display: none;
+}
+
     </style>
 </head>
 <body>
@@ -254,9 +305,43 @@
     
     <div class="content">
         <div class="post-card">
-            <form action="/Update_Profile" method="post">
+            <form action="/Update_Profile" method="post" enctype="multipart/form-data">
                 <div class="post-header">
-                    <img src="{{.Image}}" alt="User" class="profile-pic">
+                    <div class="profile-pic-container">
+                        <img src="{{.Image}}" alt="User" class="profile-pic" id="profilePic">
+                        <div class="upload-overlay">
+                            <span>Upload</span>
+                        </div>
+                        <input type="file" id="fileInput" name="image" accept="image/*">
+                        <!-- <input type="file" name="image" accept="image/*"> -->
+                    </div>
+                    
+                </div>
+                <div class="post-content">
+                    <div class="post-info">
+                        <input type="name" placeholder="{{.Name}}" name="name">
+                    </div>
+                    <div class="post-info">
+                        <input type="email" placeholder="{{.Email}}" name="email">
+                    </div>
+                    <div class="post-info">
+                        <input type="password" placeholder="********" name="password">
+                    </div>
+                </div>
+                <div class="post-footer">
+                    <button type="submit" class="btn">Confirm</button>
+                    <a href="/Profile_Account"><button type="button" class="btn">Cancel</button></a>
+                </div>
+            </form>
+            <!-- <form action="/Update_Profile" method="post">
+                <div class="post-header">
+                    <div class="profile-pic-container">
+                        <img src="{{.Image}}" alt="User" class="profile-pic" id="profilePic">
+                        <div class="upload-overlay">
+                            <span>Upload</span>
+                        </div>
+                        <input type="file" id="fileInput" name="profile-picture" accept="image/*">
+                    </div>
                 </div>
 
                 <div class="post-content">
@@ -266,18 +351,39 @@
                     <div class="post-info">
                         <input type="email" placeholder="{{.Email}}" name="email">
                     </div>
-                    <!-- <div class="post-info">
+                    <div class="post-info">
                         <input type="password" placeholder="********" name="password" required>
-                    </div> -->
+                    </div>
                 </div>
 
                 <div class="post-footer">
-                    <a href="/Update_Profile"><button type="submit" class="btn">Confirme</button></a>
+                    <a href="/Update_Profile"><button type="submit" class="btn">Confirm</button></a>
             </form>
                     <a href="/Profile_Account"> <button type="submit" class="btn">Cancel</button></a>
-                </div>
+                </div> -->
         </div>
     </div>
+    <script>
+        const profilePicContainer = document.querySelector(".profile-pic-container");
+        const fileInput = document.getElementById("fileInput");
+
+        // Add click event listener to the entire container
+        profilePicContainer.addEventListener("click", () => {
+            fileInput.click(); // Trigger the file input dialog
+        });
+
+        fileInput.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const profilePic = document.querySelector(".profile-pic");
+                    profilePic.src = e.target.result; // Update the profile picture preview
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
     <script>
         const burger = document.querySelector(".burger");
         const nav = document.querySelector(".nav-links");

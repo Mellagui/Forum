@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
     <style>
         /* Side-Bar */
         .side-bar {
@@ -39,7 +39,7 @@
             /* border: 1px solid #333; */
             padding: 0 1rem 1rem 1rem;
             margin-top: 1.5rem;
-            height: 71vh;
+            /* height: 71vh; */
         }
         .top-members {
             font-size: 1.5rem;
@@ -287,7 +287,7 @@
             margin: 5px;
             transition: all 0.3s ease;
         }
-        @media screen and (max-width: 1600px) {
+        @media screen and (max-width: 1200px) {
             .name {
                 display: none;
             }
@@ -381,16 +381,16 @@
                   {{range .}}
                     <div class="post-card">
                         <div class="post-header">
-                            <img src="{{.Image}}" alt="User" class="profile-pic">
+                            <img src="{{.ImageS}}" alt="User" class="profile-pic">
                             <div class="post-info">
-                                <p class="posted-by">Posted by<span>{{.Name}}</span></p>
+                                <p class="posted-by">Posted by<span>{{.NameS}}</span></p>
                             </div>
                             <p class="time-ago">1hrs ago</p>
                         </div>
                 
                         <div class="post-content">
                             <h3>Find your peripheral's service centre details here!</h3>
-                            <img src="{{.Image}}" alt="image-pose" />
+                            <img src="{{.ImageS}}" alt="image-pose" />
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud <a href="#">see more</a></p>
                         </div>
                 
@@ -415,11 +415,11 @@
                 </div>
 
                 <div class="members">
-                    <h2 class="top-members">Top Members:</h2>
+                    <h2 class="top-members">Top Members</h2>
                     {{range .}}
                     <div class="entry">
-                        <img class="img-top-user" src="{{.Image}}" alt="{{.Name}}">
-                        <div class="name">{{.Name}}</div>
+                        <img class="img-top-user" src="{{.ImageS}}" alt="{{.NameS}}">
+                        <div class="name">{{.NameS}}</div>
                         <div class="score">1K</div>
                     </div>
                     {{end}}
