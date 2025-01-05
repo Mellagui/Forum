@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Post</title>
+    <link rel="stylesheet" href="../static/post.css">
+</head>
+<body>
+    <div class="content">
+        <div class="post-card">
+        <form action="/New_Post" method="post">
+            <div class="post-header">
+                <img src="{{.Image}}" alt="User" class="profile-pic">
+                <div class="post-info">
+                    <p class="posted-by"><span>{{.Name}}</span></p>
+                </div>
+                <a href="/" class="time-ago">Cancel</a>
+            </div>
+            <div class="post-content">
+                <div class="post-info" style="border: none;">
+                    <p class="posted-by" style="margin-bottom: 2rem;">upload_img<span></span></p>
+                </div>
+                <div class="post-info">
+                    <input type="text" placeholder="content" name="content" style="height: 4rem;">
+                </div>
+                <div class="post-info">
+                    <input type="text" placeholder="title" name="title">
+                </div>
+                <div class="post-info">
+                    <input type="text" placeholder="category" name="category">
+                </div>
+            </div>
+            <div class="post-footer">
+                <button type="submit" class="btn">partage</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</body>
+</html>

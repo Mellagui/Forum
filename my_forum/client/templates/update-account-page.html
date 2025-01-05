@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Profile</title>
+    <link rel="stylesheet" href="../static/profileUpdate.css">
+</head>
+<body>
+    <div class="content">
+        <div class="post-card">
+            <form action="/Update_Profile" method="post" enctype="multipart/form-data">
+                <div class="post-header">
+                    <div class="profile-pic-container">
+                        <img src="{{.Image}}" alt="User" class="profile-pic" id="profilePic">
+                        <div class="upload-overlay">
+                            <span>Upload</span>
+                        </div>
+                        <input type="file" id="fileInput" name="image" accept="image/*">
+                    </div>
+                </div>
+                <div class="post-content">
+                    <div class="post-info">
+                        <input type="name" placeholder="{{.Name}}" name="name">
+                    </div>
+                    <div class="post-info">
+                        <input type="email" placeholder="{{.Email}}" name="email">
+                    </div>
+                    <div class="post-info">
+                        <input type="password" placeholder="********" name="password">
+                    </div>
+                </div>
+                <div class="post-footer">
+                    <a>
+                        <button type="submit" class="btn">Confirm</button>
+                    </a>
+                    <a href="/Profile_Account"><button type="button" class="btn">Cancel</button></a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        const profilePicContainer = document.querySelector(".profile-pic-container");
+        const fileInput = document.getElementById("fileInput");
+
+        // Add click event listener to the entire container
+        profilePicContainer.addEventListener("click", () => {
+            fileInput.click(); // Trigger the file input dialog
+        });
+
+        fileInput.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const profilePic = document.querySelector(".profile-pic");
+                    profilePic.src = e.target.result; // Update the profile picture preview
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

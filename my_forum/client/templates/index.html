@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForumBook</title>
+    <link rel="stylesheet" href="../static/index.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="logo">ForumBook</a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/Profile_Account">Account</a></li>
+            </ul>
+            <div class="burger">
+                <div class="line1"></div>
+                <div class="line2"></div>
+                <div class="line3"></div>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="content">
+            <div class="main">
+                <div class="entry">
+                    <div class="entry-head">
+                        <ul class="links">
+                            <li><div class="hid-1"><img src="../static/img/Home.png" class="profile-pic2" alt="img" /><div class="hid-a"><a href="/">Home</a></div></li>
+                            <li><div class="hid-1"><img src="../static/img/Profile.png" class="profile-pic2" alt="img" /><div class="hid-a"><a href="/Profile_Account">Account</a></div></li>
+                            <!-- <li><div class="hid-1"><img src="../static/img/chat.png" class="profile-pic2" alt="img" /><div class="hid-a"><a href="/Chat_Rooms">Chat</a></div></li> -->
+                            <li><div class="hid-1"><img src="../static/img/NewPost.png" class="profile-pic2" alt="img" /><div class="hid-a"><a href="/New_Post">NewPost</a></div></li>
+                            <li><div class="hid-1"><img src="../static/img/Filter.png" class="profile-pic2" alt="img" /><div class="hid-a"><a href="/Filter">Filter</a></div></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mc">
+                    {{range .}}
+                    <div class="post-card">
+                        <div class="post-header">
+                            <img src="{{.UserImage}}" alt="User" class="profile-pic">
+                            <div class="post-info">
+                                <p class="posted-by">Posted by<span> {{.UserName}}</span></p>
+                            </div>
+                            <p class="time-ago">1hrs ago</p>
+                        </div>
+                        <div class="post-footer">
+                            <p><span style="color: #fff;">{{.CategoryName}}</span></p>
+                        </div>  
+                        <div class="post-content">
+                            <img src="{{.PostImage}}" alt="image-pose"/>
+                            <h3>{{.PostTitle}}</h3>
+                            <p><span style="color: #fff;">{{.UserName}} </span>{{.PostContent}}</p><!-- <a href="#">see more</a> -->
+                        </div>
+                            <div class="post-footer">
+                                <div class="votes">                                    
+                                    <form action="/IsLike" method="post">
+                                        <textarea name="postId" hidden>{{.PostId}}</textarea>
+                                        <textarea name="userId" hidden>{{.UserId}}</textarea>
+                                        <textarea name="isLike" hidden>true</textarea>
+                                        <a class="upvote"><button type="submit" style="color: green;">⬆</button></a>
+                                    </form>
+                                    <span class="upvote-count">{{.NbrLike}}</span>
+                                    <form action="/IsLike" method="post">
+                                        <textarea name="postId" hidden>{{.PostId}}</textarea>
+                                        <textarea name="userId" hidden>{{.UserId}}</textarea>
+                                        <textarea name="isLike" hidden>false</textarea>
+                                        <button class="downvote" type="submit" style="color: red;">⬇</button>
+                                    </form>
+                                    <span class="downvote-count">{{.NbrDislike}}</span>
+                                    <span>💬{{.NbrComment}}</span>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                            <form action="/Comment" method="post">
+                                <textarea name="postId" hidden>{{.PostId}}</textarea>
+                                <textarea name="userId" hidden>{{.UserId}}</textarea>
+                                <input class="inputOO" name="content" placeholder="comment"></input>
+                                <button type="submit" style="background-color: rgba(0, 255, 0, 0.574); color: #fff;">comment</button>
+                            </form>
+                        </div>
+                    </div>
+                  {{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const burger = document.querySelector(".burger");
+        const nav = document.querySelector(".nav-links");
+        const navLinks = document.querySelectorAll(".nav-links li");
+  
+        burger.addEventListener("click", () => {
+          nav.classList.toggle("active");
+  
+          navLinks.forEach((link, index) => {
+            if (link.style.animation) {
+              link.style.animation = "";
+            } else {
+              link.style.animation = `navLinkFade 0.5s ease forwards ${
+                index / 7 + 0.1
+              }s`;
+            }
+          });
+  
+          // Burger Animation
+          burger.classList.toggle("toggle");
+        });
+    </script>
+</body>
+</html>

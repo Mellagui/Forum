@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="../static/profile.css">
+</head>
+<body>
+    <div class="content">
+        <div class="post-card">
+            <div class="post-header">
+                <img src="{{.Image}}" alt="User" class="profile-pic">
+                <a href="/Update_Profile" class="forgot-password">Update</a>
+            </div>
+            <div class="post-content">
+                <div class="post-info">
+                    <p class="posted-by">Name<span>{{.Name}}</span></p>
+                </div>
+                <div class="post-info">
+                    <p class="posted-by">Email<span>{{.Email}}</span></p>
+                </div>
+            </div>
+            <div class="post-footer">
+                <div class="post-info">
+                    <p class="posted-by">Join In<span>{{.CreatedAt}}</span></p>
+                </div>
+            </div>
+            <div class="post-header">
+                <form action="/Log_Out" method="post">
+                    <textarea name="email" hidden>{{.Email}}</textarea>
+                    <button type="submit" class="btn">Log-Out</button>
+                </form>
+                <a href="/"><button type="button" class="btn">Return</button></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

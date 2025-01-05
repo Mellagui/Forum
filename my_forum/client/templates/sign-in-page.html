@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignIn</title>
+    <link rel="stylesheet" href="../static/signIn.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-box">
+            <div class="logo">
+                <img src="logo.png" alt="Logo">
+            </div>
+            <h2>Welcome back</h2>
+            <p>Please enter your details.</p>
+
+            <!-- Display error message if exists -->
+            {{if .ErrorMessage}}
+            <div class="error-message" style="color: red; margin-bottom: 10px;">
+                {{.ErrorMessage}}
+            </div>
+            {{end}}
+
+            <form action="/Sign_In" method="post">
+                <input type="email" placeholder="Enter your email" name="email" required>
+                <input type="password" placeholder="Enter your password" name="password" required>
+
+                <div class="options">
+                    <label>
+                        <input type="checkbox"> Remember me</input>
+                    </label>
+                    <a href="#" class="forgot-password">Forgot password</a>
+                </div>
+
+                <button type="submit" class="create-btn">Connect Account</button>
+            </form>
+                <p class="signup-link">Don't have an account?<a href="/Sign_Up"> Sign Up</a></p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const errorMessage = document.querySelector(".error-message");
+            const inputs = document.querySelectorAll("input");
+
+            inputs.forEach(input => {
+                input.addEventListener("input", () => {
+                    if (errorMessage) {
+                        errorMessage.style.display = "none";
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
