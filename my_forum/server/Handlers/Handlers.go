@@ -99,6 +99,7 @@ func HandleSignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	users, err := Cruds.GetAllUsers()
+	// fmt.Println(users)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
@@ -109,7 +110,9 @@ func HandleSignIn(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		GlobVar.UserEmail = r.FormValue("email")
+		// fmt.Println(GlobVar.UserEmail)
 		password := r.FormValue("password")
+		// fmt.Println(password)
 
 		// Is Valid Acconut Redirect to /
 		for _, user := range users {
@@ -121,36 +124,6 @@ func HandleSignIn(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, "/Sign_In", 303)
 		return
-		// for render error message to client 
-
-		//     if r.Method == http.MethodPost {
-		//         email := r.FormValue("email")
-		//         password := r.FormValue("password")
-		//         data := Cruds.GetUserByAny(email)
-		//         if data == nil || data.Email != email || data.PasswordHash != password {
-		//             // Render the sign-in page with an error message
-		//             tmpl, err := template.ParseFiles(filepath.Join(GlobVar.TemplatesPath, "sign-in-page.html"))
-		//             if err != nil {
-		//                 http.Error(w, "Internal server error", http.StatusInternalServerError)
-		//                 return
-		//             }
-		//             // Add error message to the data passed to the template
-		//             tmplData := struct {
-		//                 ErrorMessage string
-		//             }{
-		//                 ErrorMessage: "Incorrect email or password. Please try again.",
-		//             }
-		//             err = tmpl.Execute(w, tmplData)
-		//             if err != nil {
-		//                 http.Error(w, "Internal server error", http.StatusInternalServerError)
-		//             }
-		//             return
-		//         }
-		//         // Successful login
-		//         GlobVar.Guest = false
-		//         http.Redirect(w, r, "/Home", http.StatusSeeOther) // 303: See Other
-		//         return
-		//     }
 	}
 
 	if r.Method != http.MethodGet {
@@ -162,8 +135,8 @@ func HandleSignIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	// err = tmpl.Execute(w, nil)
-	err = tmpl.Execute(w, r)
+
+	err = tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 	}

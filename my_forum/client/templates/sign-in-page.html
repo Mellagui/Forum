@@ -15,13 +15,6 @@
             <h2>Welcome back</h2>
             <p>Please enter your details.</p>
 
-            <!-- Display error message if exists -->
-            {{if .ErrorMessage}}
-            <div class="error-message" style="color: red; margin-bottom: 10px;">
-                {{.ErrorMessage}}
-            </div>
-            {{end}}
-
             <form action="/Sign_In" method="post">
                 <input type="email" placeholder="Enter your email" name="email" required>
                 <input type="password" placeholder="Enter your password" name="password" required>
@@ -38,19 +31,5 @@
                 <p class="signup-link">Don't have an account?<a href="/Sign_Up"> Sign Up</a></p>
         </div>
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const errorMessage = document.querySelector(".error-message");
-            const inputs = document.querySelectorAll("input");
-
-            inputs.forEach(input => {
-                input.addEventListener("input", () => {
-                    if (errorMessage) {
-                        errorMessage.style.display = "none";
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>
