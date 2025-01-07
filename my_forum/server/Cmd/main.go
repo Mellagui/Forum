@@ -8,6 +8,7 @@ import (
 	"forum/Migrations"
 	"forum/GlobVar"
 	"forum/Handlers"
+	"forum/Cookies"
 
 	_ "github.com/mattn/go-sqlite3"
 )
