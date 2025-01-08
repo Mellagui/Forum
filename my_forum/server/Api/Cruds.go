@@ -94,6 +94,39 @@ func InsertLikeDislike(userId, postId int, isLike bool) {
 	GlobVar.AddLikeDislikeSucces = true
 }
 
+// this function deletes the like and dislike from the database
+func DeleteLikeDislike(userId, postId int) {
+	query := `DELETE FROM likeDislike WHERE user_id = ? AND post_id = ?`
+
+	_, err := GlobVar.DB.Exec(query, userId, postId)
+	if err != nil {
+		log.Printf("error deleting like or dislike: %v", err)
+		GlobVar.DeleteLikeDislikeSuccess = false
+		return
+	}
+
+	GlobVar.DeleteLikeDislikeSuccess = true
+}
+
+// this function checks if the like or dislike already exist
+func CheckLikeDislikeExists(userId, postId int) (bool, bool) {
+    var isLike bool
+    query := `SELECT is_like FROM likeDislike WHERE user_id = ? AND post_id = ?`
+
+    err := GlobVar.DB.QueryRow(query, userId, postId).Scan(&isLike)
+    if err != nil {
+        if err == sql.ErrNoRows {
+			// makayn la like la dislike
+            return false, false
+        }
+        return false, false
+    }
+    // Return true o isLike
+    return true, isLike
+}
+
+
+
 // Update Data
 func UpdateUser(email, name, image, password, userEmail string) {
 	query := `UPDATE users SET user_name = ?, user_image = ?, email = ?, password_hash = ? WHERE email = ?`
@@ -102,7 +135,6 @@ func UpdateUser(email, name, image, password, userEmail string) {
 		log.Printf("error exec query Update: %v", err)
 	}
 }
-
 
 // Get Data
 func GetUserByAny(required string) *GlobVar.User {

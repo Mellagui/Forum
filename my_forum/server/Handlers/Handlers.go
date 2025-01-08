@@ -58,15 +58,28 @@ func HandleLikeDislike(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		if r.FormValue("isLike") == "false" {
-			postId, _ := strconv.Atoi(r.FormValue("postId"))
-			userId, _ := strconv.Atoi(r.FormValue("userId"))
-			Cruds.InsertLikeDislike(userId, postId, false)
-		} else if r.FormValue("isLike") == "true" {
-			postId, _ := strconv.Atoi(r.FormValue("postId"))
-			userId, _ := strconv.Atoi(r.FormValue("userId"))
-			Cruds.InsertLikeDislike(userId, postId, true)
+		postId, err2 := strconv.Atoi(r.FormValue("postId"))
+		userId, err1 := strconv.Atoi(r.FormValue("userId"))
+		isLike := r.FormValue("isLike") == "true"
+
+		if err1 != nil || err2 != nil {
+			http.Error(w, "Error in the Post Id or the User Id", http.StatusBadRequest)
+			return
 		}
+
+		exists, currentIsLike := Cruds.CheckLikeDislikeExists(userId, postId)
+
+		if exists {
+			if isLike == currentIsLike {
+				Cruds.DeleteLikeDislike(userId, postId)
+			} else {
+				Cruds.DeleteLikeDislike(userId, postId)
+				Cruds.InsertLikeDislike(userId, postId, isLike)
+			}
+		} else {
+			Cruds.InsertLikeDislike(userId, postId, isLike)
+		}
+
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -393,8 +406,8 @@ func HandleNewPost(w http.ResponseWriter, r *http.Request) {
 	data := Cruds.GetUserByAny(GlobVar.UserEmail)
 	if r.Method == http.MethodPost {
 		title := r.FormValue("title")
-		content := r.FormValue("content")
 		category := r.FormValue("category")
+		content := r.FormValue("content")
 
 		Cruds.InsertPost(data.ID, GlobVar.DefaultImage, title, content, category)
 		if GlobVar.AddPostSucces {

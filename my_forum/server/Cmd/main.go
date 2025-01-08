@@ -4,11 +4,10 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
-	
-	"forum/Migrations"
+
 	"forum/GlobVar"
 	"forum/Handlers"
-	"forum/Cookies"
+	"forum/Migrations"
 
 	_ "github.com/mattn/go-sqlite3"
 )

@@ -11,11 +11,11 @@ body {
     height: 100vh;
     justify-content: center;
     align-items: center;
+    margin: 20px;
 }
 
 .content {
     display: flex;
-    /* border: 1px solid #333; */
     margin: 4rem;
     justify-content: center;
     align-items: center;
@@ -24,6 +24,7 @@ body {
 .post-card {
     background-color: #111;
     border-radius: 10px;
+    box-shadow: 4px 4px 5px #333;
     border: 1px solid #333;
     width: 30rem;
     padding: 1rem;
@@ -34,7 +35,9 @@ body {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 15px;
+    padding: 5px 10px;
     border: 1px solid #333;
+    border-radius: 5px;
 }
 
 .profile-pic {
@@ -51,7 +54,8 @@ body {
 }
 
 .posted-by {
-    font-size: 14px;
+    font-size: 18px;
+    margin-bottom: 10px;
     color: #555;
 }
 
@@ -60,9 +64,24 @@ body {
     color: #fff;
 }
 
+.back {
+    display: inline-block;
+    border-radius: 5px;
+    padding: 10px 5px;
+    background-color: #e90e0e;
+    cursor: pointer;
+    transition: background-color 0.5s ease;
+}
+
+.back:hover {
+    background-color: #9e0808;
+}
+
 .time-ago {
-    font-size: 12px;
-    color: #333;
+    text-decoration: none;
+    font-size: 20px;
+    color: #fff;
+    margin: 20px;
 }
 
 .post-content p {
@@ -81,14 +100,6 @@ body {
     font-size: 14px;
     color: #444;
     /* border: 1px solid #333; */
-}
-
-a {
-    color: #444;
-    text-decoration: none;
-}
-a:hover {
-    text-decoration: underline;
 }
 
 .btn {
@@ -111,22 +122,35 @@ span {
 }
 
 input[type="text"],
-input[type="content"],
-input[type="category"] {
+input[type="category"],
+textarea {
     width: 100%;
     padding: 10px;
-    margin-bottom: 15px;
-    background-color: #111; /* Input background */
+    background-color: #111;
     color: #fff;
     border: 1px solid #111;
-    /* border-top: 1px solid #222; */
     border-radius: 5px;
-    font-size: 0.9rem;
+    font-size: 1.3rem;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
 }
+
+/* Specific styles for textarea */
+textarea {
+    height: 200px; /* Adjust height to suit your needs */
+    padding: 10px; /* Larger padding for content */
+    resize: vertical; /* Allow resizing vertically only */
+    font-size: 1.3rem;
+}
+
+
+
+textarea::placeholder,
 input::placeholder {
     color: #333;
 }
+
+textarea:focus,
 input:focus {
-    outline: none;
-    border-color: #0f0; /* Green border on focus */
+    outline: none; 
+    border-color: #0f0; 
 }

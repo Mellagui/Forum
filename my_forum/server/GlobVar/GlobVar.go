@@ -83,13 +83,14 @@ var (
 	Comments      []Comment
 	LikesDislikes []LikeDislike
 
-	UserEmail            string
-	Guest                bool
-	AddAccountSucces     bool
-	AddPostSucces        bool
-	AddCommentSucces     bool
-	AddCategorySucces    bool
-	AddLikeDislikeSucces bool
+	UserEmail                string
+	Guest                    bool
+	AddAccountSucces         bool
+	AddPostSucces            bool
+	AddCommentSucces         bool
+	AddCategorySucces        bool
+	AddLikeDislikeSucces     bool
+	DeleteLikeDislikeSuccess bool
 )
 
 const TemplatesPath = "../../client/templates/"
