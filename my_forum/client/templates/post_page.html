@@ -12,26 +12,26 @@
   </head>
   <body>
     <div id="navbar-placeholder"></div>
-    <div class="container--post">
-      <div class="post-layout">
+    <div class="container">
+      <div class="post-detail-layou">
         <!-- Post Main Section -->
-        <div class="post-main">
-          <div class="post--card">
-            <div class="post-scroll">
-              <!-- Post Image -->
-              <img src="{{.Post.Image}}" alt="Post image" class="post-image" />
-              <div class="post--content">
-                <!-- Post Title -->
-                <h1 class="post--title">{{.Post.Title}}</h1>
-                <!-- Post Content -->
-                <p class="post--description">{{.Post.Content}}</p>
-                <!-- Post Meta (Author and Category) -->
-                <div class="post--meta">
+        <div class="post-detail-main">
+          <div class="post-card">
+            <div class="post-conten">
+              <img
+                src="{{.Post.Image}}"
+                alt="Post image"
+                class="post-image"
+                style="height: 400px"
+              />
+              <div class="post-content">
+                <h1 class="post-title">{{.Post.Title}}</h1>
+                <p class="post-description">{{.Post.Content}}</p>
+                <div class="post-meta">
                   <span>Posted by {{.User.Name}}</span>
                   <span>{{.Post.Category}}</span>
                 </div>
-                <!-- Post Actions (Like, Dislike, Comment) -->
-                <div class="post--actions">
+                <div class="post-actions">
                   <form action="/IsLike" method="post" class="action-form">
                     <input type="hidden" name="postId" value="{{.Post.ID}}" />
                     <input type="hidden" name="userId" value="{{.User.ID}}" />
@@ -41,7 +41,7 @@
                       class="action-btn like-btn"
                       data-post-id="{{.Post.ID}}"
                     >
-                      👍 <span class="like--count">{{.Likes}}</span>
+                      👍 <span class="like-count">{{.Likes}}</span>
                     </button>
                   </form>
                   <form action="/IsLike" method="post" class="action-form">
@@ -53,14 +53,14 @@
                       class="action-btn dislike-btn"
                       data-post-id="{{.Post.ID}}"
                     >
-                      👎 <span class="dislike--count">{{.Dislikes}}</span>
+                      👎 <span class="dislike-count">{{.Dislikes}}</span>
                     </button>
                   </form>
                   <button
                     class="action-btn comment-btn"
                     data-post-id="{{.Post.ID}}"
                   >
-                    💬 <span class="comment--count">{{len .Comments}}</span>
+                    💬 <span class="comment-count">{{len .Comments}}</span>
                   </button>
                 </div>
               </div>
@@ -68,11 +68,9 @@
           </div>
         </div>
 
-        <!-- Comments Sidebar -->
         <div class="comments-sidebar">
           <div class="comments-header">Comments ({{len .Comments}})</div>
           <div class="comments-list">
-            <!-- Loop through comments and display them -->
             {{range .Comments}}
             <div class="comment">
               <div class="comment-author">{{.Content}}</div>
