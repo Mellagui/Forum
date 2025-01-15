@@ -1,4 +1,4 @@
-package Sign_In
+package LogIn
 
 import (
 	"fmt"
