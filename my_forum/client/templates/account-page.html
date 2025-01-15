@@ -1,39 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile</title>
-    <link rel="stylesheet" href="../static/profile.css">
-</head>
-<body>
-    <div class="content">
-        <div class="post-card">
-            <div class="post-header">
-                <img src="{{.Image}}" alt="User" class="profile-pic">
-                <a href="/Update_Profile" class="forgot-password">Update</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - Forum</title>
+    <link rel="stylesheet" href="../static/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="container">
+      <div class="profile-container">
+        <div class="profile-header">
+          <img
+            src="{{.Image}}"
+            alt="Profile"
+            class="profile-avatar"
+            id="profile-avatar"
+          />
+          <div class="profile-info">
+            <h1 id="profile-name">{{.Name}}</h1>
+            <p id="profile-email" style="color: var(--text-secondary)">
+              {{.Email}}
+            </p>
+            <div class="profile-stats">
+              <div class="stat-item">
+                <div class="stat-value">42</div>
+                <div class="stat-label">Posts</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">1.2k</div>
+                <div class="stat-label">Likes</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">156</div>
+                <div class="stat-label">Comments</div>
+              </div>
             </div>
-            <div class="post-content">
-                <div class="post-info">
-                    <p class="posted-by">Name<span>{{.Name}}</span></p>
-                </div>
-                <div class="post-info">
-                    <p class="posted-by">Email<span>{{.Email}}</span></p>
-                </div>
-            </div>
-            <div class="post-footer">
-                <div class="post-info">
-                    <p class="posted-by">Join In<span>{{.CreatedAt}}</span></p>
-                </div>
-            </div>
-            <div class="post-header">
-                <form action="/Log_Out" method="post">
-                    <textarea name="email" hidden>{{.Email}}</textarea>
-                    <button type="submit" class="btn">Log-Out</button>
-                </form>
-                <a href="/"><button type="button" class="btn">Return</button></a>
-            </div>
+            <a
+              href="/Update_Profile"
+              class="btn btn-primary"
+              style="margin-top: 1rem"
+              >Edit Profile</a
+            >
+            <form action="/Log_Out" method="post">
+              <button
+                type="submit"
+                class="btn btn-error"
+                style="margin-top: 1rem"
+              >
+                SignOut
+              </button>
+            </form>
+          </div>
         </div>
+        <div class="posts-grid">
+          <!-- User's posts will be dynamically added here -->
+        </div>
+      </div>
     </div>
-</body>
+
+    <script src="../static/utils/theme.js"></script>
+  </body>
 </html>

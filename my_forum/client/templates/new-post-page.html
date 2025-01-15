@@ -1,47 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Post - Forum</title>
+    <link rel="stylesheet" href="../static/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="navbar-placeholder"></div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Post</title>
-    <link rel="stylesheet" href="../static/post.css">
-</head>
-
-<body>
-    <div class="back">
-        <a href="/" class="time-ago">Back Home</a>
+    <div class="container">
+      <div class="form-container" style="max-width: 800px">
+        <h1 style="margin-bottom: 2rem">Create Post</h1>
+        <form method="post" id="create-post-form">
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" required name="title" />
+          </div>
+          <div class="form-group">
+            <label for="content">Content</label>
+            <textarea id="content" rows="10" name="content" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="image">Image (optional)</label>
+            <input type="file" id="image" name="post_image" accept="image/*" />
+          </div>
+          <button type="submit" class="btn btn-primary">Create Post</button>
+        </form>
+      </div>
     </div>
-    <div class="content">
-        <div class="post-card">
-            <form action="/New_Post" method="post">
-                <div class="post-header">
-                    <img src="{{.Image}}" alt="User" class="profile-pic">
-                    <div class="post-info">
-                        <p class="posted-by"><span>{{.Name}}</span></p>
-                    </div>
-                </div>
-                <div class="post-content">
-                    <!-- <div class="post-info">
-                        <p class="posted-by"><span>upload_img</span></p>
-                    </div> -->
-                    <div class="post-info">
-                        <input type="text" placeholder="Title" name="title">
-                    </div>
-                    <div class="post-info">
-                        <input type="text" placeholder="Category" name="category">
-                    </div>
-                    <div class="post-info">
-                        <textarea type="text" placeholder="Content" name="content"></textarea>
-                    </div>
-                </div>
 
-                <div class="post-footer">
-                    <button type="submit" class="btn">Post</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</body>
-
+    <script src="../static/utils/theme.js"></script>
+  </body>
 </html>
