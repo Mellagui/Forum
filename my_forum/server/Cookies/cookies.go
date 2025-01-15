@@ -3,12 +3,9 @@ package cookies
 import (
 	"crypto/rand"
 	"encoding/base64"
-<<<<<<< HEAD
 	"log"
 	"net/http"
 	"time"
-=======
->>>>>>> 8b4c6c13ff40445ddc419949e8f6400f2b9564b6
 )
 
 // Generate_Cookie_session generates a cryptographically secure random session ID.
@@ -21,7 +18,6 @@ func Generate_Cookie_session() (string, error) {
     return base64.RawStdEncoding.EncodeToString(id), nil
 }
 
-<<<<<<< HEAD
 // This Function set cookies
 func Set_Cookies_Handler(w http.ResponseWriter, r *http.Request) {
 	_, err := r.Cookie("Session_ID")
@@ -33,7 +29,11 @@ func Set_Cookies_Handler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	session_id := Generate_Cookie_session()
+	session_id, err := Generate_Cookie_session()
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	cookies := &http.Cookie{
 		Name: "Session_ID", // cookie name
 		Value: session_id,
@@ -55,5 +55,3 @@ func Delete_Cookie_Handler(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, cookies)
 }
-=======
->>>>>>> 8b4c6c13ff40445ddc419949e8f6400f2b9564b6
