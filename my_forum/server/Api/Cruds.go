@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"forum/GlobVar"
-	cookies "forum/cookies"
+	cookies "forum/Cookies"
 
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"

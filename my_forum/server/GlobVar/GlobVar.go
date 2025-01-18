@@ -33,7 +33,7 @@ type Comment struct {
 	Content   string    `db:"content" json:"content"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
-	UserName string		`db:"UserName" json:"UserName"`
+	UserName  string    `db:"UserName" json:"UserName"`
 }
 
 type Categories struct {
@@ -57,10 +57,10 @@ type LikeDislike struct {
 type Home struct {
 	ID string `json:"id"`
 	// Post
-	PostId        string    `json:"post_id"`        // Post.ID
-	PostImage     string    `json:"post_image"`     // Post.Image
-	PostTitle     string    `json:"post_title"`     // Post.Title
-	PostContent   string    `json:"post_content"`   // Post.Content
+	PostId        string    `json:"post_id"`         // Post.ID
+	PostImage     string    `json:"post_image"`      // Post.Image
+	PostTitle     string    `json:"post_title"`      // Post.Title
+	PostContent   string    `json:"post_content"`    // Post.Content
 	PostCreatedAt time.Time `json:"post_created_at"` // Post.CreatedAt
 	// User
 	UserId    string `json:"user_id"`
@@ -77,20 +77,21 @@ type Home struct {
 
 var (
 	UpdateLikeDislikeSuccess bool
-	DB            *sql.DB
-	Users         []User
-	Posts         []Post
-	Comments      []Comment
-	LikesDislikes []LikeDislike
-
+	DB                       *sql.DB
+	Users                    []User
+	Posts                    []Post
+	Comments                 []Comment
+	LikesDislikes            []LikeDislike
+	Guest                    bool
 	UserId                   string
+	UserEmail                string
 	AddAccountSucces         bool
 	AddPostSucces            bool
 	AddCommentSucces         bool
 	AddCategorySucces        bool
 	AddLikeDislikeSucces     bool
 	DeleteLikeDislikeSuccess bool
-	UserMutex sync.Mutex 
+	UserMutex                sync.Mutex
 )
 
 const (

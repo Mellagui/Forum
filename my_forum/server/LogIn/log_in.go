@@ -3,7 +3,8 @@ package LogIn
 import (
 	"fmt"
 	"forum/Cookies"
-	"forum/GlobVar"
+	g "forum/GlobVar"
+	"forum/Api"
 	"log"
 	"net/http"
 	"text/template"
@@ -25,7 +26,7 @@ func PasswordHash(password string) string {
 func insertUser(name, email, password string) error {
 	imagePath := "../Uploads/image.jpg"
 	query := `insert into users (email, user_name, password_hash, user_image) values (?,?,?,?)`
-	_, err := db.Exec(query, email, name, password, imagePath)
+	_, err := g.DB.Exec(query, email, name, password, imagePath)
 	if err != nil {
 		return fmt.Errorf("failed to insert user: %v", err)
 	}
@@ -49,9 +50,9 @@ func HandleSignUp(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to insert user", http.StatusInternalServerError)
 			return
 		}
-		if GlobVar.AddAccountSucces {
-			GlobVar.Guest = false
-			GlobVar.AddAccountSucces = false
+		if g.AddAccountSucces {
+			g.Guest = false
+			g.AddAccountSucces = false
 			cookies.Set_Cookies_Handler(w, r)
 			http.Redirect(w, r, "/", 303)
 			return
@@ -96,9 +97,9 @@ func HandleSignIn(w http.ResponseWriter, r *http.Request) {
 		password = PasswordHash(password)
 
 		for _, user := range users {
-			if user.Email == mail && user.Password == password {
-				GlobVar.UserEmail = mail
-				GlobVar.Guest = false
+			if user.Email == mail && user.PasswordHash == password {
+				g.UserEmail = mail
+				g.Guest = false
 				cookies.Set_Cookies_Handler(w, r)
 				http.Redirect(w, r, "/", 303)
 				return
