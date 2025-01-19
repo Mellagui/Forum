@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"forum/GlobVar"
 	cookies "forum/Cookies"
+	"forum/GlobVar"
 
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -32,22 +32,21 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-
 // Insert Data
 func InsertUser(name, image, email, password string) string {
-    id := GenerateUUID()
-    hashedPassword, err := HashPassword(password)
-    if err != nil {
-        log.Printf("error hashing password: %v", err)
-        return ""
-    }
-    query := `INSERT INTO users (id, email, user_name, password_hash, user_image) VALUES (?, ?, ?, ?, ?)`
-    _, err = GlobVar.DB.Exec(query, id, email, name, hashedPassword, image)
-    if err != nil {
-        log.Printf("error inserting user: %v", err)
-        return ""
-    }
-    return id
+	id := GenerateUUID()
+	hashedPassword, err := HashPassword(password)
+	if err != nil {
+		log.Printf("error hashing password: %v", err)
+		return ""
+	}
+	query := `INSERT INTO users (id, email, user_name, password_hash, user_image) VALUES (?, ?, ?, ?, ?)`
+	_, err = GlobVar.DB.Exec(query, id, email, name, hashedPassword, image)
+	if err != nil {
+		log.Printf("error inserting user: %v", err)
+		return ""
+	}
+	return id
 }
 
 func InsertPost(userId, image, title, content, category string) bool {
@@ -121,16 +120,16 @@ func CheckLikeDislikeExists(userId, postId string) (bool, bool) {
 }
 
 func GetPostByID(postID string) (string, *GlobVar.Post, error) {
-    query := `SELECT id, user_id, image_url, title, content, category, created_at FROM posts WHERE id = ?`
-    var post GlobVar.Post
-    err := GlobVar.DB.QueryRow(query, postID).Scan(&post.ID, &post.UserId, &post.Image, &post.Title, &post.Content, &post.Category, &post.CreatedAt)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            return "" ,nil, fmt.Errorf("post not found")
-        }
-        return "" ,nil, err
-    }
-    return "" ,&post, nil
+	query := `SELECT id, user_id, image_url, title, content, category, created_at FROM posts WHERE id = ?`
+	var post GlobVar.Post
+	err := GlobVar.DB.QueryRow(query, postID).Scan(&post.ID, &post.UserId, &post.Image, &post.Title, &post.Content, &post.Category, &post.CreatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", nil, fmt.Errorf("post not found")
+		}
+		return "", nil, err
+	}
+	return "", &post, nil
 }
 
 // Update Data
@@ -159,21 +158,34 @@ func UpdateUser(email, name, image, password, userId string) {
 
 // Get Data
 func GetUserByAny(required string) *GlobVar.User {
-    query := `SELECT id, email, user_name, password_hash, user_image, created_at FROM users WHERE id = ?`
-    var user GlobVar.User
-    err := GlobVar.DB.QueryRow(query, required).Scan(&user.ID, &user.Email, &user.Name, &user.PasswordHash, &user.Image, &user.CreatedAt)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            fmt.Println("User not found:", required) // Debugging
-            return nil
-        }
-        log.Printf("error getUserByName: %v", err)
-        return nil
-    }
-    return &user
+	query := `SELECT id, email, user_name, password_hash, user_image, created_at FROM users WHERE id = ?`
+	var user GlobVar.User
+	err := GlobVar.DB.QueryRow(query, required).Scan(&user.ID, &user.Email, &user.Name, &user.PasswordHash, &user.Image, &user.CreatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("User not found:", required) // Debugging
+			return nil
+		}
+		log.Printf("error getUserByName: %v", err)
+		return nil
+	}
+	return &user
 }
 
-
+func GetUserByEmail(email string) *GlobVar.User {
+	query := `SELECT id, email, user_name, password_hash, user_image, created_at FROM users WHERE email = ?`
+	var user GlobVar.User
+	err := GlobVar.DB.QueryRow(query, email).Scan(&user.ID, &user.Email, &user.Name, &user.PasswordHash, &user.Image, &user.CreatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("User not found:", email) // Debugging
+			return nil
+		}
+		log.Printf("error getUserByName: %v", err)
+		return nil
+	}
+	return &user
+}
 
 // Get All Data
 func GetAllUsers() ([]GlobVar.User, error) {
@@ -221,29 +233,29 @@ func GetAllPosts() ([]GlobVar.Post, error) {
 }
 
 func GetAllComments() ([]GlobVar.Comment, error) {
-    query := `
+	query := `
         SELECT c.id, c.post_id, c.user_id, c.content, u.user_name 
         FROM comments c
         JOIN users u ON c.user_id = u.id
     `
-    rows, err := GlobVar.DB.Query(query)
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()
+	rows, err := GlobVar.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-    var comments []GlobVar.Comment
-    for rows.Next() {
-        var cmt GlobVar.Comment
-        if err := rows.Scan(&cmt.ID, &cmt.PostId, &cmt.UserId, &cmt.Content, &cmt.UserName); err != nil {
-            return nil, err
-        }
-        comments = append(comments, cmt)
-    }
-    if err = rows.Err(); err != nil {
-        return nil, err
-    }
-    return comments, nil
+	var comments []GlobVar.Comment
+	for rows.Next() {
+		var cmt GlobVar.Comment
+		if err := rows.Scan(&cmt.ID, &cmt.PostId, &cmt.UserId, &cmt.Content, &cmt.UserName); err != nil {
+			return nil, err
+		}
+		comments = append(comments, cmt)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return comments, nil
 }
 
 func GetAllLikeDislike() ([]GlobVar.LikeDislike, error) {
@@ -269,88 +281,87 @@ func GetAllLikeDislike() ([]GlobVar.LikeDislike, error) {
 }
 
 func ValidateSessionIDAndGetUserID(sessionID string) (string, bool) {
-    var expiresAt time.Time
-    var userID string
-    query := `SELECT user_id, expires_at FROM Session WHERE id = ?`
-    err := GlobVar.DB.QueryRow(query, sessionID).Scan(&userID, &expiresAt)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            fmt.Println("Session not found:", sessionID) // Debugging
-            return "", false
-        }
-        log.Printf("Error validating session ID: %v", err)
-        return "", false
-    }
+	var expiresAt time.Time
+	var userID string
+	query := `SELECT user_id, expires_at FROM Session WHERE id = ?`
+	err := GlobVar.DB.QueryRow(query, sessionID).Scan(&userID, &expiresAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("Session not found:", sessionID) // Debugging
+			return "", false
+		}
+		log.Printf("Error validating session ID: %v", err)
+		return "", false
+	}
 
-    // Check if the session is expired
-    if time.Now().After(expiresAt) {
-        fmt.Println("Session expired:", sessionID)
-        return "", false
-    }
+	// Check if the session is expired
+	if time.Now().After(expiresAt) {
+		fmt.Println("Session expired:", sessionID)
+		return "", false
+	}
 
-
-    return userID, true
+	return userID, true
 }
 
 func Set_Cookies_Handler(w http.ResponseWriter, r *http.Request, userID string) {
-    var sessionID, token string
-    var err error
+	var sessionID, token string
+	var err error
 
-    // Generate a unique session ID
-    sessionID, err = cookies.Generate_Cookie_session()
-    if err != nil {
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-        log.Printf("Error generating session ID: %v", err)
-        return
-    }
+	// Generate a unique session ID
+	sessionID, err = cookies.Generate_Cookie_session()
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		log.Printf("Error generating session ID: %v", err)
+		return
+	}
 
-    // Generate a unique token for the session
-    for {
-        token, err = cookies.Generate_Cookie_session()
-        if err != nil {
-            http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-            log.Printf("Error generating session token: %v", err)
-            return
-        }
+	// Generate a unique token for the session
+	for {
+		token, err = cookies.Generate_Cookie_session()
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Printf("Error generating session token: %v", err)
+			return
+		}
 
-        // Check if the token already exists in the database
-        var exists bool
-        query := `SELECT EXISTS(SELECT 1 FROM Session WHERE token = ?)`
-        err = GlobVar.DB.QueryRow(query, token).Scan(&exists)
-        if err != nil {
-            http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-            log.Printf("Error checking token existence: %v", err)
-            return
-        }
+		// Check if the token already exists in the database
+		var exists bool
+		query := `SELECT EXISTS(SELECT 1 FROM Session WHERE token = ?)`
+		err = GlobVar.DB.QueryRow(query, token).Scan(&exists)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Printf("Error checking token existence: %v", err)
+			return
+		}
 
-        if !exists {
-            break // Token is unique, exit the loop
-        }
-    }
+		if !exists {
+			break // Token is unique, exit the loop
+		}
+	}
 
-    // Insert the session into the database
-    expiresAt := time.Now().Add(7 * 24 * time.Hour) // Session expires in 7 days
-    query := `INSERT INTO Session (id, user_id, token, expires_at) VALUES (?, ?, ?, ?)`
-    _, err = GlobVar.DB.Exec(query, sessionID, userID, token, expiresAt)
-    if err != nil {
-        log.Printf("Error storing session in database: %v", err) // Debugging
-        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-        return
-    }
+	// Insert the session into the database
+	expiresAt := time.Now().Add(7 * 24 * time.Hour) // Session expires in 7 days
+	query := `INSERT INTO Session (id, user_id, token, expires_at) VALUES (?, ?, ?, ?)`
+	_, err = GlobVar.DB.Exec(query, sessionID, userID, token, expiresAt)
+	if err != nil {
+		log.Printf("Error storing session in database: %v", err) // Debugging
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
-    fmt.Println("Session created for user:", userID) // Debugging
+	fmt.Println("Session created for user:", userID) // Debugging
 
-    // Set the session cookie
-    cookie := &http.Cookie{
-        Name:     "Session_ID",
-        Value:    sessionID,
-        Path:     "/",
-        Secure:   true,
-        HttpOnly: true,
-        Expires:  expiresAt,
-        SameSite: http.SameSiteStrictMode,
-    }
-    http.SetCookie(w, cookie)
+	// Set the session cookie
+	cookie := &http.Cookie{
+		Name:     "Session_ID",
+		Value:    sessionID,
+		Path:     "/",
+		Secure:   true,
+		HttpOnly: true,
+		Expires:  expiresAt,
+		SameSite: http.SameSiteStrictMode,
+	}
+	http.SetCookie(w, cookie)
 }
 
 func Delete_Cookie_Handler(w http.ResponseWriter, r *http.Request) {

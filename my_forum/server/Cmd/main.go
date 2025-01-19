@@ -13,6 +13,13 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+// handle min-length password in sign-up
+// handle js message invalid userName
+// handle userName-comments
+// image handling
+// avatar resize
+// new-post textearia resize
+
 func init() {
 	var err error
 	GlobVar.DB, err = sql.Open("sqlite", "../Database/database.db")

@@ -82,10 +82,8 @@ var (
 	Posts                    []Post
 	Comments                 []Comment
 	LikesDislikes            []LikeDislike
-	Guest                    bool
-	UserId                   string
-	UserEmail                string
 	AddAccountSucces         bool
+	UserId                   string
 	AddPostSucces            bool
 	AddCommentSucces         bool
 	AddCategorySucces        bool

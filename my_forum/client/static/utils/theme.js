@@ -68,3 +68,4 @@ async function checkAuthStatus() {
     return false;
   }
 }
+

@@ -151,7 +151,7 @@ func HandleLikeDislike(w http.ResponseWriter, r *http.Request) {
 			Cruds.InsertLikeDislike(userId, postId, isLike)
 		}
 
-		http.Redirect(w, r, "/post/?id="+postId, http.StatusSeeOther)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 	if r.Method == http.MethodGet {
@@ -189,7 +189,7 @@ func HandleSignIn(w http.ResponseWriter, r *http.Request) {
 
 		// Fetch the user
 		GlobVar.UserMutex.Lock()
-		user := Cruds.GetUserByAny(GlobVar.UserId)
+		user := Cruds.GetUserByEmail(email)
 		GlobVar.UserMutex.Unlock()
 		if user == nil {
 			fmt.Println("User not found for email:", email) // Debugging
